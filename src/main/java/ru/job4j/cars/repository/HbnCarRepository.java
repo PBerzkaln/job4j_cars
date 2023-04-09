@@ -53,19 +53,19 @@ public class HbnCarRepository implements CarRepository {
 
     public List<Car> findAllOrderById() {
         return crudRepository.query(
-                "FROM Car AS c JOIN FETCH c.engine JOIN FETCH c.owners ORDER BY c.id ASC", Car.class);
+                "FROM Car AS c JOIN FETCH c.engine ORDER BY c.id ASC", Car.class);
     }
 
     public Optional<Car> findById(int carId) {
         return crudRepository.optional(
-                "FROM Car AS c JOIN FETCH c.engine JOIN FETCH c.owners WHERE c.id = :fId", Car.class,
+                "FROM Car AS c JOIN FETCH c.engine WHERE c.id = :fId", Car.class,
                 Map.of("fId", carId)
         );
     }
 
     public Optional<Car> findByName(String name) {
         return crudRepository.optional(
-                "FROM Car AS c JOIN FETCH c.engine JOIN FETCH c.owners WHERE c.name = :fname", Car.class,
+                "FROM Car AS c JOIN FETCH c.engine WHERE c.name = :fname", Car.class,
                 Map.of("fname", name)
         );
     }
