@@ -71,4 +71,4 @@ mvn spring-boot:run
 
 ## Контакты:
 
-- <a href="https://t.me/I_amPablo/" target="_blank">Телеграм</a></h1>blo
+- <a href="https://t.me/I_amPablo/" target="_blank">Телеграм</a></h1>
