@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class HbnPostRepository implements PostRepository {
-    private static final Logger LOG = LogManager.getLogger(HbnEngineRepository.class.getName());
+    private static final Logger LOG = LogManager.getLogger(HbnPostRepository.class.getName());
     private final CrudRepository crudRepository;
 
     public Optional<Post> create(Post post) {
@@ -89,5 +89,20 @@ public class HbnPostRepository implements PostRepository {
                         + "WHERE p.car.name = :fName", Post.class,
                 Map.of("fName", model)
         );
+    }
+
+    @Override
+    public boolean setIsSold(int id) {
+        var mark = findById(id).get().isSold() ? Boolean.FALSE : Boolean.TRUE;
+        boolean rsl = false;
+        try {
+            crudRepository.run("UPDATE Post SET sold = :fsold WHERE id = :fId",
+                    Map.of("fId", id, "fsold", mark)
+            );
+            rsl = true;
+        } catch (Exception e) {
+            LOG.debug(e.getMessage(), e);
+        }
+        return rsl;
     }
 }

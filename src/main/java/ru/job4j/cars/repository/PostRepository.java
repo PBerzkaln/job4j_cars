@@ -23,4 +23,5 @@ public interface PostRepository {
     List<Post> findWithPhoto();
 
     List<Post> findByModel(String model);
+    boolean setIsSold(int id);
 }
