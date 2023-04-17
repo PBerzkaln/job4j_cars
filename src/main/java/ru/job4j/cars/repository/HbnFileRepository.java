@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class HbnFileRepository implements FileRepository {
-    private static final Logger LOG = LogManager.getLogger(HbnEngineRepository.class.getName());
+    private static final Logger LOG = LogManager.getLogger(HbnFileRepository.class.getName());
     private final CrudRepository crudRepository;
 
     @Override
