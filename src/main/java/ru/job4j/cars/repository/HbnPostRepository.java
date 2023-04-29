@@ -1,8 +1,6 @@
 package ru.job4j.cars.repository;
 
 import lombok.AllArgsConstructor;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Post;
 
@@ -14,42 +12,20 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class HbnPostRepository implements PostRepository {
-    private static final Logger LOG = LogManager.getLogger(HbnPostRepository.class.getName());
     private final CrudRepository crudRepository;
 
-    public Optional<Post> create(Post post) {
-        Optional<Post> rsl = Optional.empty();
-        try {
-            crudRepository.run((session -> session.save(post)));
-            rsl = Optional.of(post);
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+    public Post create(Post post) {
+        crudRepository.run((session -> session.save(post)));
+        return post;
     }
 
     public boolean update(Post post) {
-        boolean rsl = false;
-        try {
-            crudRepository.run(session -> session.merge(post));
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        crudRepository.run(session -> session.merge(post));
+        return true;
     }
 
     public boolean delete(int postId) {
-        boolean rsl = false;
-        try {
-            crudRepository.run("DELETE Post WHERE id = :fId",
-                    Map.of("fId", postId)
-            );
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        return crudRepository.booleanQuery("DELETE Post WHERE id = :fId", Map.of("fId", postId));
     }
 
     public List<Post> findAllOrderById() {
@@ -94,15 +70,7 @@ public class HbnPostRepository implements PostRepository {
     @Override
     public boolean setIsSold(int id) {
         var mark = findById(id).get().isSold() ? Boolean.FALSE : Boolean.TRUE;
-        boolean rsl = false;
-        try {
-            crudRepository.run("UPDATE Post SET sold = :fsold WHERE id = :fId",
-                    Map.of("fId", id, "fsold", mark)
-            );
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        return crudRepository.booleanQuery("UPDATE Post SET sold = :fsold WHERE id = :fId",
+                Map.of("fId", id, "fsold", mark));
     }
 }

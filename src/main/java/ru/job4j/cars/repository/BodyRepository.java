@@ -6,15 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BodyRepository {
-    Optional<Body> create(Body body);
-
-    boolean update(Body body);
-
-    boolean delete(int bodyId);
-
     List<Body> findAllOrderById();
 
     Optional<Body> findById(int bodyId);
-
-    Optional<Body> findByName(String name);
 }

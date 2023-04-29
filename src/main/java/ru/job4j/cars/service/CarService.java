@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CarService {
-    Optional<Car> save(Car car);
+    Car save(Car car);
 
     boolean update(Car car);
 

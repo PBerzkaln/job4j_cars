@@ -1,8 +1,6 @@
 package ru.job4j.cars.repository;
 
 import lombok.AllArgsConstructor;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Car;
 
@@ -13,42 +11,21 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class HbnCarRepository implements CarRepository {
-    private static final Logger LOG = LogManager.getLogger(HbnCarRepository.class.getName());
     private final CrudRepository crudRepository;
 
-    public Optional<Car> create(Car car) {
-        Optional<Car> rsl = Optional.empty();
-        try {
-            crudRepository.run((session -> session.save(car)));
-            rsl = Optional.of(car);
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+    public Car create(Car car) {
+        crudRepository.run((session -> session.save(car)));
+        return car;
     }
 
     public boolean update(Car car) {
-        boolean rsl = false;
-        try {
-            crudRepository.run(session -> session.merge(car));
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        crudRepository.run(session -> session.merge(car));
+        return true;
     }
 
     public boolean delete(int carId) {
-        boolean rsl = false;
-        try {
-            crudRepository.run("DELETE Car WHERE id = :fId",
-                    Map.of("fId", carId)
-            );
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        return crudRepository.booleanQuery("DELETE Car WHERE id = :fId",
+                Map.of("fId", carId));
     }
 
     public List<Car> findAllOrderById() {

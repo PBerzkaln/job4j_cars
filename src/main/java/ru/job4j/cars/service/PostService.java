@@ -1,6 +1,7 @@
 package ru.job4j.cars.service;
 
 import ru.job4j.cars.dto.FileDto;
+import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.PostDto;
 import ru.job4j.cars.model.Post;
 
@@ -11,7 +12,7 @@ public interface PostService {
     List<PostDto> findAll();
     List<PostDto> getAllWithPhoto();
     List<PostDto> getAllForTheLastDay();
-    Optional<Post> create(Post post, FileDto image);
+    Post create(PostCreateDto postDto, FileDto image);
     Optional<PostDto> findById(int postId);
     boolean setIsSold(int postId);
     boolean delete(int postId);

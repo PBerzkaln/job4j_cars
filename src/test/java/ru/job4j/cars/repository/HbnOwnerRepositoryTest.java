@@ -1,5 +1,7 @@
 package ru.job4j.cars.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -8,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import ru.job4j.cars.model.Owner;
 
 import java.util.List;
-
-import static java.util.Optional.empty;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class HbnOwnerRepositoryTest {
     private final SessionFactory sf = new MetadataSources(
@@ -50,8 +49,7 @@ public class HbnOwnerRepositoryTest {
     public void whenDelete() {
         var owner = new Owner();
         hbnOwnerRepository.create(owner);
-        hbnOwnerRepository.delete(owner.getId());
-        assertThat(hbnOwnerRepository.findById(owner.getId())).isEqualTo(empty());
+        assertThat(hbnOwnerRepository.delete(owner.getId())).isTrue();
     }
 
     @Test

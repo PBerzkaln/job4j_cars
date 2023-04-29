@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.cars.dto.FileDto;
+import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.model.*;
 import ru.job4j.cars.service.*;
 
@@ -21,7 +22,6 @@ public class PostController {
     private final EngineService engineService;
     private final BodyService bodyService;
     private final TransmissionService transmissionService;
-    private final CarService carService;
 
     @GetMapping
     public String getAll(Model model) {
@@ -42,43 +42,19 @@ public class PostController {
     }
 
     @GetMapping("/create")
-    public String getCreationPage() {
+    public String getCreationPage(Model model) {
+        model.addAttribute("all_engines", engineService.findAllOrderById());
+        model.addAttribute("all_bodies", bodyService.findAllOrderById());
+        model.addAttribute("all_transmissions", transmissionService.findAllOrderById());
         return "all_posts/create";
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute Post post,
+    public String create(@ModelAttribute PostCreateDto postDto,
                          @RequestParam MultipartFile fileDto, Model model,
-                         @RequestParam("carName") String carName,
-                         @RequestParam("engineName") String engineName,
-                         @RequestParam("bodyName") String bodyName,
-                         @RequestParam("transmissionName") String transmissionName,
                          @SessionAttribute User user) throws IOException {
-        var engine = new Engine();
-        engine.setName(engineName);
-        engineService.save(engine);
-        var body = new Body();
-        body.setName(bodyName);
-        bodyService.save(body);
-        var transmission = new Transmission();
-        transmission.setName(transmissionName);
-        transmissionService.save(transmission);
-        var car = new Car();
-        car.setTransmission(transmission);
-        car.setBody(body);
-        car.setEngine(engine);
-        car.setName(carName);
-        var savedCar = carService.save(car);
-        post.setCar(car);
-        post.setUser(user);
-        var savedPost = postService.create(post,
-                new FileDto(fileDto.getOriginalFilename(), fileDto.getBytes()));
-        if (savedCar.isEmpty() || savedPost.isEmpty()) {
-            model.addAttribute("message",
-                    String.format("%s%s", "Не удалось создать объявление.",
-                            "Перейдите на страницу создания объявления и попробуйте снова."));
-            return "errors/404";
-        }
+        postDto.setUser(user);
+        postService.create(postDto, new FileDto(fileDto.getOriginalFilename(), fileDto.getBytes()));
         return "redirect:/all_posts";
     }
 

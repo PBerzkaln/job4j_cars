@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface PostRepository {
 
-    Optional<Post> create(Post post);
+    Post create(Post post);
 
     boolean update(Post post);
 
@@ -23,5 +23,6 @@ public interface PostRepository {
     List<Post> findWithPhoto();
 
     List<Post> findByModel(String model);
+
     boolean setIsSold(int id);
 }

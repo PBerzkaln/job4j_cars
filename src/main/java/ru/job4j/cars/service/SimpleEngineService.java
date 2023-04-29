@@ -16,21 +16,6 @@ public class SimpleEngineService implements EngineService {
     private final EngineRepository engineRepository;
 
     @Override
-    public Optional<Engine> save(Engine engine) {
-        return engineRepository.create(engine);
-    }
-
-    @Override
-    public boolean update(Engine engine) {
-        return engineRepository.update(engine);
-    }
-
-    @Override
-    public boolean delete(int engineId) {
-        return engineRepository.delete(engineId);
-    }
-
-    @Override
     public List<Engine> findAllOrderById() {
         return engineRepository.findAllOrderById();
     }
@@ -38,10 +23,5 @@ public class SimpleEngineService implements EngineService {
     @Override
     public Optional<Engine> findById(int engineId) {
         return engineRepository.findById(engineId);
-    }
-
-    @Override
-    public Optional<Engine> findByName(String name) {
-        return engineRepository.findByName(name);
     }
 }

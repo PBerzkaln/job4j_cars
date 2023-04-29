@@ -16,7 +16,7 @@ public class SimpleCarService implements CarService {
     private final HbnCarRepository hbnCarRepository;
 
     @Override
-    public Optional<Car> save(Car car) {
+    public Car save(Car car) {
         return hbnCarRepository.create(car);
     }
 

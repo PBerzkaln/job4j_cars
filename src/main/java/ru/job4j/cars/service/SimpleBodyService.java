@@ -16,21 +16,6 @@ public class SimpleBodyService implements BodyService {
     private final HbnBodyRepository hbnBodyRepository;
 
     @Override
-    public Optional<Body> save(Body body) {
-        return hbnBodyRepository.create(body);
-    }
-
-    @Override
-    public boolean update(Body body) {
-        return hbnBodyRepository.update(body);
-    }
-
-    @Override
-    public boolean delete(int bodyId) {
-        return hbnBodyRepository.delete(bodyId);
-    }
-
-    @Override
     public List<Body> findAllOrderById() {
         return hbnBodyRepository.findAllOrderById();
     }
@@ -38,10 +23,5 @@ public class SimpleBodyService implements BodyService {
     @Override
     public Optional<Body> findById(int bodyId) {
         return hbnBodyRepository.findById(bodyId);
-    }
-
-    @Override
-    public Optional<Body> findByName(String name) {
-        return hbnBodyRepository.findByName(name);
     }
 }

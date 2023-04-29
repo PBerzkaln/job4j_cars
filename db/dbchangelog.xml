@@ -20,5 +20,6 @@
     <include file="scripts/013_ddl_create_transmission_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/014_ddl_create_body_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/015_ddl_alter_car_table.sql" relativeToChangelogFile="true"/>
-    <include file="scripts/016_ddl_alter_auto_user_table.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/016_dml_insert_engine_body_transmissions_tables.sql"
+             relativeToChangelogFile="true"/>
 </databaseChangeLog>

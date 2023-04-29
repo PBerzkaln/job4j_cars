@@ -4,13 +4,16 @@ import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
 import ru.job4j.cars.dto.FileDto;
+import ru.job4j.cars.dto.PostCreateDto;
 import ru.job4j.cars.dto.PostDto;
+import ru.job4j.cars.model.Car;
+import ru.job4j.cars.model.Owner;
 import ru.job4j.cars.model.Post;
-import ru.job4j.cars.repository.CarRepository;
-import ru.job4j.cars.repository.PostRepository;
+import ru.job4j.cars.repository.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @ThreadSafe
@@ -19,14 +22,19 @@ public class SimplePostService implements PostService {
     private final PostRepository postRepository;
     private final FileService fileService;
     private final CarRepository carRepository;
+    private final OwnerRepository ownerRepository;
+    private final EngineRepository engineRepository;
+    protected final TransmissionRepository transmissionRepository;
+    private final BodyRepository bodyRepository;
 
     private List<PostDto> postDtoBuilder(List<Post> posts) {
         return posts.stream().map(post ->
                 new PostDto(post.getId(), post.getPrice(), post.getFile().getId(), post.isSold(),
-                        post.getCar().getName(), post.getUser().getName(), post.getDescription(), post.getCreated(),
-                        carRepository.findById(post.getCar().getId()).get().getBody().getName(),
-                        carRepository.findById(post.getCar().getId()).get().getTransmission().getName(),
-                        carRepository.findById(post.getCar().getId()).get().getEngine().getName())).toList();
+                        bodyRepository.findById(post.getCar().getBody().getId()).get().getName(),
+                        transmissionRepository.findById(post.getCar().getTransmission().getId()).get().getName(),
+                        engineRepository.findById(post.getCar().getEngine().getId()).get().getName(),
+                        post.getCar().getName(), post.getDescription(), post.getUser(),
+                        post.getCreated())).toList();
     }
 
     @Override
@@ -45,7 +53,24 @@ public class SimplePostService implements PostService {
     }
 
     @Override
-    public Optional<Post> create(Post post, FileDto image) {
+    public Post create(PostCreateDto postDto, FileDto image) {
+        var owner = new Owner();
+        owner.setName(postDto.getUser().getLogin());
+        owner.setUser(postDto.getUser());
+        ownerRepository.create(owner);
+        var car = new Car();
+        car.setName(postDto.getCarName());
+        car.setEngine(engineRepository.findById(postDto.getEngineId()).get());
+        car.setTransmission(transmissionRepository.findById(postDto.getTransmissionId()).get());
+        car.setBody(bodyRepository.findById(postDto.getBodyId()).get());
+        car.setOwners(Set.of(owner));
+        carRepository.create(car);
+        var post = new Post();
+        post.setPrice(postDto.getPrice());
+        post.setSold(false);
+        post.setDescription(postDto.getDescription());
+        post.setUser(postDto.getUser());
+        post.setCar(car);
         saveNewFile(post, image);
         return postRepository.create(post);
     }

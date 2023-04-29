@@ -18,40 +18,20 @@ public class HbnFileRepository implements FileRepository {
 
     @Override
     public Optional<File> create(File file) {
-        Optional<File> rsl = Optional.empty();
-        try {
-            crudRepository.run((session -> session.save(file)));
-            rsl = Optional.of(file);
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        crudRepository.run((session -> session.save(file)));
+        return Optional.of(file);
     }
 
     @Override
     public boolean update(File file) {
-        boolean rsl = false;
-        try {
-            crudRepository.run(session -> session.merge(file));
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        crudRepository.run(session -> session.merge(file));
+        return true;
     }
 
     @Override
     public boolean delete(int fileId) {
-        boolean rsl = false;
-        try {
-            crudRepository.run("DELETE File WHERE id = :fId",
-                    Map.of("fId", fileId)
-            );
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        return crudRepository.booleanQuery("DELETE File WHERE id = :fId",
+                Map.of("fId", fileId));
     }
 
     @Override

@@ -30,12 +30,12 @@
                         Объявления за последние сутки</a>
                 </div>
                 <div class="d-flex">
-                    <div class="d-flex" th:if="${user.name == 'Гость'}">
+                    <div class="d-flex" th:if="${user.login == 'Гость'}">
                         <a class="nav-link text-secondary me-3" th:href="@{/users/register}">Регистрация</a>
                         <a class="nav-link text-secondary me-3" th:href="@{/users/login}">Войти</a>
                     </div>
-                    <div class="d-flex" th:if="${user.name != 'Гость'}">
-                        <a class="nav-link text-secondary me-3" href="#" th:text="${user.name}"></a>
+                    <div class="d-flex" th:if="${user.login != 'Гость'}">
+                        <a class="nav-link text-secondary me-3" href="#" th:text="${user.login}"></a>
                         <a class="nav-link text-secondary" th:href="@{/users/logout}">Выйти</a>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                         <td><a th:text="${post.carName}"
                                th:href="@{/all_posts/{postId}(postId=${post.id})}"></a></td>
                         <td th:text="${post.price}"/>
-                        <td th:text="${post.postOwnerName}"/>
+                        <td th:text="${post.user.login}"/>
                         <td th:text="${#temporals.format(post.created, 'dd-MM-yyyy HH:mm')}"></td>
                         <td th:text="${post.bodyName}"/>
                         <td th:text="${post.transmissionName}"/>

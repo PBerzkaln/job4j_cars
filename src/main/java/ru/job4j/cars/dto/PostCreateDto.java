@@ -12,17 +12,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PostDto {
+public class PostCreateDto {
     @EqualsAndHashCode.Include
     private int id;
     private int price;
     private int fileId;
+    private int bodyId;
+    private int transmissionId;
+    private int engineId;
     private boolean sold;
-    private String bodyName;
-    private String transmissionName;
-    private String engineName;
     private String carName;
     private String description;
-    private User user;
     private LocalDateTime created;
+    private User user;
 }

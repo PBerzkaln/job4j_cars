@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OwnerRepository {
-    Optional<Owner> create(Owner owner);
+    Owner create(Owner owner);
 
     boolean update(Owner owner);
 

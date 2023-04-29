@@ -1,8 +1,6 @@
 package ru.job4j.cars.repository;
 
 import lombok.AllArgsConstructor;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Owner;
 
@@ -13,42 +11,21 @@ import java.util.Optional;
 @Repository
 @AllArgsConstructor
 public class HbnOwnerRepository implements OwnerRepository {
-    private static final Logger LOG = LogManager.getLogger(HbnOwnerRepository.class.getName());
     private final CrudRepository crudRepository;
 
-    public Optional<Owner> create(Owner owner) {
-        Optional<Owner> rsl = Optional.empty();
-        try {
-            crudRepository.run((session -> session.save(owner)));
-            rsl = Optional.of(owner);
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+    public Owner create(Owner owner) {
+        crudRepository.run((session -> session.save(owner)));
+        return owner;
     }
 
     public boolean update(Owner owner) {
-        boolean rsl = false;
-        try {
-            crudRepository.run(session -> session.merge(owner));
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        crudRepository.run(session -> session.merge(owner));
+        return true;
     }
 
     public boolean delete(int ownerId) {
-        boolean rsl = false;
-        try {
-            crudRepository.run("DELETE Owner WHERE id = :fId",
-                    Map.of("fId", ownerId)
-            );
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        return crudRepository.booleanQuery("DELETE Owner WHERE id = :fId",
+                Map.of("fId", ownerId));
     }
 
     public List<Owner> findAllOrderById() {

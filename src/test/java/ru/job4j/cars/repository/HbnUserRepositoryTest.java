@@ -1,5 +1,7 @@
 package ru.job4j.cars.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -8,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import ru.job4j.cars.model.User;
 
 import java.util.List;
-
-import static java.util.Optional.empty;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class HbnUserRepositoryTest {
     private final SessionFactory sf = new MetadataSources(
@@ -36,6 +35,16 @@ public class HbnUserRepositoryTest {
     }
 
     @Test
+    public void whenAddSameUserAndGetException() {
+        var user1 = new User();
+        user1.setLogin("user1");
+        hbnUserRepository.create(user1);
+        var user2 = new User();
+        user2.setLogin("user1");
+        assertThat(hbnUserRepository.create(user2)).isEmpty();
+    }
+
+    @Test
     public void whenReplace() {
         var user = new User();
         user.setLogin("user");
@@ -50,8 +59,7 @@ public class HbnUserRepositoryTest {
     public void whenDelete() {
         var user = new User();
         hbnUserRepository.create(user);
-        hbnUserRepository.delete(user.getId());
-        assertThat(hbnUserRepository.findById(user.getId())).isEqualTo(empty());
+        assertThat(hbnUserRepository.delete(user.getId())).isTrue();
     }
 
     @Test
@@ -75,7 +83,9 @@ public class HbnUserRepositoryTest {
     public void whenFindByLogin() {
         var user = new User();
         user.setLogin("user");
+        user.setPassword("password");
         hbnUserRepository.create(user);
-        assertThat(hbnUserRepository.findByLogin(user.getLogin()).get()).isEqualTo(user);
+        assertThat(hbnUserRepository.findByLoginAndPassword(
+                user.getLogin(), user.getPassword()).get()).isEqualTo(user);
     }
 }

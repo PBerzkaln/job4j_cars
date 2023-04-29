@@ -23,14 +23,13 @@ public class HbnUserRepository implements UserRepository {
      * @return пользователь с id.
      */
     public Optional<User> create(User user) {
-        Optional<User> rsl = Optional.empty();
         try {
             crudRepository.run((session -> session.save(user)));
-            rsl = Optional.of(user);
+            return Optional.of(user);
         } catch (Exception e) {
             LOG.debug(e.getMessage(), e);
+            return Optional.empty();
         }
-        return rsl;
     }
 
     /**
@@ -39,14 +38,8 @@ public class HbnUserRepository implements UserRepository {
      * @param user пользователь.
      */
     public boolean update(User user) {
-        boolean rsl = false;
-        try {
-            crudRepository.run(session -> session.merge(user));
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        crudRepository.run(session -> session.merge(user));
+        return true;
     }
 
     /**
@@ -55,16 +48,8 @@ public class HbnUserRepository implements UserRepository {
      * @param userId ID
      */
     public boolean delete(int userId) {
-        boolean rsl = false;
-        try {
-            crudRepository.run("DELETE User WHERE id = :fId",
-                    Map.of("fId", userId)
-            );
-            rsl = true;
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return rsl;
+        return crudRepository.booleanQuery("DELETE User WHERE id = :fId",
+                Map.of("fId", userId));
     }
 
     /**
@@ -107,10 +92,10 @@ public class HbnUserRepository implements UserRepository {
      * @param login login.
      * @return Optional or user.
      */
-    public Optional<User> findByLogin(String login) {
+    public Optional<User> findByLoginAndPassword(String login, String password) {
         return crudRepository.optional(
-                "from User where login = :fLogin", User.class,
-                Map.of("fLogin", login)
+                "from User where login = :fLogin AND password = :fPassword", User.class,
+                Map.of("fLogin", login, "fPassword", password)
         );
     }
 }

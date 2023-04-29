@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.job4j.cars.model.Body;
 import ru.job4j.cars.model.Car;
@@ -12,23 +13,36 @@ import ru.job4j.cars.model.Transmission;
 
 import java.util.List;
 
-import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class HbnCarRepositoryTest {
-    private final SessionFactory sf = new MetadataSources(
+    private final static SessionFactory SF = new MetadataSources(
             new StandardServiceRegistryBuilder().configure().build()
     ).buildMetadata().buildSessionFactory();
-    private final CrudRepository crudRepository = new CrudRepository(sf);
+    private final CrudRepository crudRepository = new CrudRepository(SF);
     private final HbnCarRepository hbnCarRepository = new HbnCarRepository(crudRepository);
     private final HbnEngineRepository hbnEngineRepository = new HbnEngineRepository(crudRepository);
     private final HbnBodyRepository hbnBodyRepository = new HbnBodyRepository(crudRepository);
     private final HbnTransmissionRepository hbnTransmissionRepository =
             new HbnTransmissionRepository(crudRepository);
 
+    @BeforeAll
+    public static void initRepos() {
+        var engine = new Engine(1, "Diesel");
+        var body = new Body(1, "Sedan");
+        var transmission = new Transmission(1, "Auto");
+        var session = SF.openSession();
+        session.beginTransaction();
+        session.save(engine);
+        session.save(body);
+        session.save(transmission);
+        session.getTransaction();
+        session.close();
+    }
+
     @AfterEach
     public void wipeTable() {
-        var session = sf.openSession();
+        var session = SF.openSession();
         session.beginTransaction();
         session.createQuery("delete from Car").executeUpdate();
         session.getTransaction();
@@ -37,20 +51,11 @@ public class HbnCarRepositoryTest {
 
     @Test
     public void whenAddNewCarThenRepoHasSameCar() {
-        var engine = new Engine();
-        engine.setName("engine");
-        hbnEngineRepository.create(engine);
-        var transmission = new Transmission();
-        transmission.setName("auto");
-        hbnTransmissionRepository.create(transmission);
-        var body = new Body();
-        body.setName("sedan");
-        hbnBodyRepository.create(body);
         var car = new Car();
         car.setName("car");
-        car.setEngine(engine);
-        car.setBody(body);
-        car.setTransmission(transmission);
+        car.setBody(hbnBodyRepository.findById(1).get());
+        car.setEngine(hbnEngineRepository.findById(1).get());
+        car.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car);
         var rsl = hbnCarRepository.findById(car.getId()).get();
         assertThat(rsl).isEqualTo(car);
@@ -58,20 +63,11 @@ public class HbnCarRepositoryTest {
 
     @Test
     public void whenReplace() {
-        var engine = new Engine();
-        engine.setName("engine");
-        hbnEngineRepository.create(engine);
-        var transmission = new Transmission();
-        transmission.setName("auto");
-        hbnTransmissionRepository.create(transmission);
-        var body = new Body();
-        body.setName("sedan");
-        hbnBodyRepository.create(body);
         var car = new Car();
         car.setName("car");
-        car.setEngine(engine);
-        car.setBody(body);
-        car.setTransmission(transmission);
+        car.setBody(hbnBodyRepository.findById(1).get());
+        car.setEngine(hbnEngineRepository.findById(1).get());
+        car.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car);
         car.setName("car1");
         hbnCarRepository.update(car);
@@ -81,74 +77,45 @@ public class HbnCarRepositoryTest {
 
     @Test
     public void whenDelete() {
-        var engine = new Engine();
-        engine.setName("engine");
-        hbnEngineRepository.create(engine);
-        var transmission = new Transmission();
-        transmission.setName("auto");
-        hbnTransmissionRepository.create(transmission);
-        var body = new Body();
-        body.setName("sedan");
-        hbnBodyRepository.create(body);
         var car = new Car();
         car.setName("car");
-        car.setEngine(engine);
-        car.setBody(body);
-        car.setTransmission(transmission);
+        car.setBody(hbnBodyRepository.findById(1).get());
+        car.setEngine(hbnEngineRepository.findById(1).get());
+        car.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car);
-        hbnCarRepository.delete(car.getId());
-        var rsl = hbnCarRepository.findById(car.getId());
-        assertThat(rsl).isEqualTo(empty());
+        assertThat(hbnCarRepository.delete(car.getId())).isTrue();
     }
 
     @Test
     public void whenFindAll() {
-        var engine = new Engine();
-        engine.setName("engine");
-        hbnEngineRepository.create(engine);
-        var transmission = new Transmission();
-        transmission.setName("auto");
-        hbnTransmissionRepository.create(transmission);
-        var body = new Body();
-        body.setName("sedan");
-        hbnBodyRepository.create(body);
         var car1 = new Car();
-        var car2 = new Car();
-        var car3 = new Car();
-        car1.setName("car1");
-        car1.setEngine(engine);
-        car1.setBody(body);
-        car1.setTransmission(transmission);
-        car2.setName("car2");
-        car2.setEngine(engine);
-        car2.setBody(body);
-        car2.setTransmission(transmission);
-        car3.setName("car3");
-        car3.setEngine(engine);
-        car3.setBody(body);
-        car3.setTransmission(transmission);
+        car1.setName("car");
+        car1.setBody(hbnBodyRepository.findById(1).get());
+        car1.setEngine(hbnEngineRepository.findById(1).get());
+        car1.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car1);
+        var car2 = new Car();
+        car2.setName("car");
+        car2.setBody(hbnBodyRepository.findById(1).get());
+        car2.setEngine(hbnEngineRepository.findById(1).get());
+        car2.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car2);
+        var car3 = new Car();
+        car3.setName("car");
+        car3.setBody(hbnBodyRepository.findById(1).get());
+        car3.setEngine(hbnEngineRepository.findById(1).get());
+        car3.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car3);
         assertThat(hbnCarRepository.findAllOrderById()).isEqualTo(List.of(car1, car2, car3));
     }
 
     @Test
     public void whenFindByName() {
-        var engine = new Engine();
-        engine.setName("engine");
-        hbnEngineRepository.create(engine);
-        var transmission = new Transmission();
-        transmission.setName("auto");
-        hbnTransmissionRepository.create(transmission);
-        var body = new Body();
-        body.setName("sedan");
-        hbnBodyRepository.create(body);
         var car = new Car();
         car.setName("car");
-        car.setEngine(engine);
-        car.setBody(body);
-        car.setTransmission(transmission);
+        car.setBody(hbnBodyRepository.findById(1).get());
+        car.setEngine(hbnEngineRepository.findById(1).get());
+        car.setTransmission(hbnTransmissionRepository.findById(1).get());
         hbnCarRepository.create(car);
         var rsl = hbnCarRepository.findByName(car.getName()).get();
         assertThat(rsl).isEqualTo(car);

@@ -44,7 +44,7 @@ public class CrudRepository {
             for (Map.Entry<String, Object> arg : args.entrySet()) {
                 sq.setParameter(arg.getKey(), arg.getValue());
             }
-            return sq.uniqueResultOptional();
+            return Optional.ofNullable(sq.getSingleResult());
         };
         return tx(command);
     }
@@ -54,6 +54,18 @@ public class CrudRepository {
                 .createQuery(query, cl)
                 .list();
         return tx(command);
+    }
+
+    public boolean booleanQuery(String query, Map<String, Object> args) {
+        Function<Session, Integer> command = session -> {
+            var sq = session
+                    .createQuery(query);
+            for (Map.Entry<String, Object> arg : args.entrySet()) {
+                sq.setParameter(arg.getKey(), arg.getValue());
+            }
+            return sq.executeUpdate();
+        };
+        return tx(command) > 0;
     }
 
     public <T> List<T> query(String query, Class<T> cl, Map<String, Object> args) {
@@ -68,32 +80,17 @@ public class CrudRepository {
         return tx(command);
     }
 
-    /**
-     * Этот метод выполняет ту самую абстрактную операцию,
-     * о которой мы говорили выше.
-     * Он принимает некую "команду", открывает сессию,
-     * начинает транзакцию и выполняет эту команду.
-     * Команда принимается в виде объекта функционального интерфейса,
-     * благодаря чему достигается абстрактность операции.
-     * Методу tx() не важно, придет команда на вставку данных,
-     * изменение, удаление и т.д. Он не знает её внутреннюю реализацию,
-     * он просто получает команду и выполняет её.
-     *
-     * @param command
-     * @param <T>
-     * @return
-     */
     public <T> T tx(Function<Session, T> command) {
+        Transaction tx = null;
         Session session = sf.openSession();
-        Transaction transaction = null;
         try {
-            transaction = session.beginTransaction();
+            tx = session.beginTransaction();
             T rsl = command.apply(session);
-            transaction.commit();
+            tx.commit();
             return rsl;
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+            if (tx != null) {
+                tx.rollback();
             }
             throw e;
         } finally {

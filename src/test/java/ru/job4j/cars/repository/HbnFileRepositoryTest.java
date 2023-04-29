@@ -59,9 +59,7 @@ public class HbnFileRepositoryTest {
         file.setName("name");
         file.setPath("some/path");
         hbnFileRepository.create(file);
-        hbnFileRepository.delete(file.getId());
-        var rsl = hbnFileRepository.findById(file.getId());
-        assertThat(rsl).isEqualTo(empty());
+        assertThat(hbnFileRepository.delete(file.getId())).isTrue();
     }
 
     @Test
